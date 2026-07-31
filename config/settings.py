@@ -128,8 +128,17 @@ def _database_from_url(url: str) -> dict:
         "CONN_MAX_AGE": 0,          # serverless: never hold a connection open
         "OPTIONS": {},
     }
-    sslmode = (qs.get("sslmode") or ["require"])[0]
-    cfg["OPTIONS"]["sslmode"] = sslmode
+    cfg["OPTIONS"]["sslmode"] = (qs.get("sslmode") or ["require"])[0]
+
+    # Supabase/PgBouncer transaction pooling (port 6543) cannot carry server-side
+    # prepared statements between requests. Django's psycopg3 backend already
+    # defaults prepare_threshold to None, but set it explicitly so the intent
+    # survives a future default change — and never enable server-side binding.
+    cfg["OPTIONS"]["prepare_threshold"] = None
+    cfg["OPTIONS"]["server_side_binding"] = False
+
+    # Supabase's pooler expects the username as-is (project-scoped, e.g.
+    # "postgres.abcdefgh"), which urlparse already gives us unquoted above.
     return cfg
 
 
