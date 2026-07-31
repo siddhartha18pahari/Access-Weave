@@ -142,7 +142,15 @@ def _database_from_url(url: str) -> dict:
     return cfg
 
 
-_DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
+# Accept whichever name the host provides. Vercel's Supabase integration injects
+# POSTGRES_URL (pooled) and POSTGRES_URL_NON_POOLING (direct); other hosts use
+# DATABASE_URL. Prefer the pooled URL — serverless opens many short connections.
+_DATABASE_URL = ""
+for _var in ("DATABASE_URL", "POSTGRES_URL", "POSTGRES_URL_NON_POOLING"):
+    _candidate = os.environ.get(_var, "").strip()
+    if _candidate:
+        _DATABASE_URL = _candidate
+        break
 if _DATABASE_URL:
     DATABASES = {"default": _database_from_url(_DATABASE_URL)}
 else:
