@@ -27,3 +27,7 @@ playwright-report/
 
 .vercel
 .env*
+
+# Vercel/Supabase marketplace agent skills (machine-local)
+.agents/
+skills-lock.json
