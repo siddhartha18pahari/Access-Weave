@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}My tasks — AccessWeave{% endblock %}
+{% block content %}
+<div class="btn-row" style="justify-content:space-between;align-items:center">
+  <h1>My tasks</h1>
+  <a class="btn" href="{% url 'task_new' %}">+ New task</a>
+</div>
+{% if tasks %}
+  <div class="stack">
+  {% for t in tasks %}
+    <div class="card" style="margin:0">
+      <div class="btn-row" style="justify-content:space-between;align-items:center">
+        <div>
+          <h2 style="margin:0"><a href="{% url 'task_player' pk=t.pk %}">{{ t.goal }}</a>
+            {% if t.source_type == 'routine' %}<span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-repeat"/></svg> Routine</span>{% endif %}
+          </h2>
+          <p class="small muted" style="margin:0.2rem 0 0">
+            {{ t.get_status_display }} · {{ t.card_count }} step{{ t.card_count|pluralize }} · updated {{ t.updated_at|timesince }} ago
+            {% if not t.source_text %}· source erased{% endif %}
+          </p>
+        </div>
+        <div class="btn-row">
+          {% if t.source_type == 'routine' %}
+          <form method="post" action="{% url 'task_repeat' pk=t.pk %}">
+            {% csrf_token %}
+            <button class="btn secondary" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-repeat"/></svg> Start again</button>
+          </form>
+          {% endif %}
+          <form method="post" action="{% url 'task_delete' pk=t.pk %}"
+                onsubmit="return confirm('Delete this task and its source?')">
+            {% csrf_token %}
+            <button class="btn ghost" type="submit">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+{% else %}
+  <div class="card"><p>No tasks yet. <a href="{% url 'task_new' %}">Start your first one</a>.</p></div>
+{% endif %}
+{% endblock %}

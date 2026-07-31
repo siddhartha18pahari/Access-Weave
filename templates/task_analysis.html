@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Why these steps — AccessWeave{% endblock %}
+{% block main_class %}wide{% endblock %}
+{% block content %}
+<a class="btn ghost" href="{% url 'task_player' pk=session.pk %}">← Back to the task</a>
+<h1>Why these steps?</h1>
+<p class="muted">Transparency by design: here's what AccessWeave detected and how it
+decided. Nothing is hidden.</p>
+
+<section class="card">
+  <h2>Barrier analysis</h2>
+  <p>{{ analysis.summary }}</p>
+  {% if analysis.reading_level %}<p class="small muted">Estimated reading level of the source: grade {{ analysis.reading_level }}.</p>{% endif %}
+  {% if analysis.barriers %}
+    <div class="stack">
+    {% for b in analysis.barriers %}
+      <div class="card" style="margin:0">
+        <div class="btn-row" style="justify-content:space-between">
+          <strong>{{ b.title }}</strong>
+          <span class="chip">{{ b.category }} · {{ b.severity }} · {{ b.confidence|floatformat:2 }}</span>
+        </div>
+        {% if b.evidence %}<p class="small muted">Evidence: {{ b.evidence }}</p>{% endif %}
+        {% if b.adaptation %}<p><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> Adaptation: {{ b.adaptation }}</p>{% endif %}
+        {% if b.requires_user_verification %}<p class="badge uncertain">You should verify this yourself.</p>{% endif %}
+      </div>
+    {% endfor %}
+    </div>
+  {% else %}
+    <p>No specific barriers were detected — the task was still turned into clear steps.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Task graph</h2>
+  <p class="small muted">Goal → barriers → adaptations → steps. This is how the recommendation can be explained.</p>
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">Task graph relationships</caption>
+      <thead><tr><th>From</th><th>Relationship</th><th>To</th></tr></thead>
+      <tbody>
+      {% for e in graph.edges %}
+        <tr><td>{{ e.from }}</td><td>{{ e.rel }}</td><td>{{ e.to }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card type-completion">
+  <h2>Accessibility contract check</h2>
+  <p class="muted">Every compiled experience is validated against deterministic accessibility rules before you see it.</p>
+  <ul>
+    <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> Every card has an accessible name and a text equivalent for speech.</li>
+    <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> Consequential actions (submit, pay, share) require explicit confirmation.</li>
+    <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> Low-confidence or safety-sensitive content is marked for you to verify.</li>
+    <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> Multi-step tasks include progress and a recovery path.</li>
+    <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> Safety instructions (like dosages) are shown verbatim and never altered.</li>
+  </ul>
+</section>
+{% endblock %}

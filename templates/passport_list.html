@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Access Passport — AccessWeave{% endblock %}
+{% block content %}
+<div class="btn-row" style="justify-content:space-between;align-items:center">
+  <h1>Your Access Passport</h1>
+  <a class="btn" href="{% url 'onboarding' %}">+ New profile</a>
+</div>
+<p class="muted">Keep several profiles for different contexts. The active one
+personalizes the whole app. Export a profile to carry it elsewhere.</p>
+
+<div class="stack">
+{% for p in profiles %}
+  <div class="card" style="margin:0">
+    <div class="btn-row" style="justify-content:space-between;align-items:center">
+      <h2 style="margin:0">{{ p.name }}
+        {% if p.is_default %}<span class="badge">Active</span>{% endif %}
+      </h2>
+      <div class="btn-row">
+        {% if not p.is_default %}
+        <form method="post" action="{% url 'passport_activate' pk=p.pk %}">{% csrf_token %}
+          <button class="btn secondary" type="submit">Make active</button>
+        </form>
+        {% endif %}
+        <a class="btn ghost" href="{% url 'passport_export' pk=p.pk %}">Export</a>
+        <button class="btn ghost" type="button" data-qr-target="pp-{{ p.pk }}"
+                data-qr-name="{{ p.name }}" aria-expanded="false"><svg class="icon" aria-hidden="true"><use href="#i-card"/></svg> Show QR</button>
+        <form method="post" action="{% url 'passport_delete' pk=p.pk %}"
+              onsubmit="return confirm('Delete this profile?')">{% csrf_token %}
+          <button class="btn ghost" type="submit">Delete</button>
+        </form>
+      </div>
+    </div>
+    {% with pkstr=p.pk|stringformat:"s" %}{% with qid="pp-"|add:pkstr %}{{ p.payload|json_script:qid }}{% endwith %}{% endwith %}
+    <div class="qr-box" id="qr-{{ p.pk }}" hidden>
+      <p class="small" style="color:#000;margin:0 0 0.5rem">Scan to carry these
+        preferences to another device — no account needed.</p>
+    </div>
+    <dl class="kv">
+      <dt>Text size</dt><dd>{{ p.payload.output.text_scale }}×</dd>
+      <dt>Contrast</dt><dd>{{ p.payload.output.contrast }}</dd>
+      <dt>Speech</dt><dd>{{ p.payload.output.speech_enabled|yesno:"on,off" }}</dd>
+      <dt>Plain language</dt><dd>{{ p.payload.cognitive.plain_language|yesno:"yes,no" }}</dd>
+      <dt>One step at a time</dt><dd>{{ p.payload.cognitive.one_step_at_a_time|yesno:"yes,no" }}</dd>
+    </dl>
+  </div>
+{% empty %}
+  <div class="card"><p>No profiles yet. <a href="{% url 'onboarding' %}">Create your Access Passport</a>.</p></div>
+{% endfor %}
+</div>
+
+<details class="card" style="margin-top:1.5rem">
+  <summary style="cursor:pointer;font-weight:700"><svg class="icon" aria-hidden="true"><use href="#i-import"/></svg> Import a passport</summary>
+  <p class="muted">Paste the JSON from an exported passport (or one shared with
+    you). It's checked against the typed schema before anything is saved.</p>
+  <form method="post" action="{% url 'passport_import' %}">
+    {% csrf_token %}
+    <label for="import-doc">Passport JSON</label>
+    <textarea name="document" id="import-doc" rows="4"
+              placeholder='{"name": "Travel", "payload": { … }}'></textarea>
+    <button class="btn" type="submit" style="margin-top:0.6rem">Import</button>
+  </form>
+</details>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/vendor/qrcode.js' %}?v={{ aw_v }}" defer></script>
+<script>
+  // Portable Access Pass: render this profile's preferences as a QR code —
+  // generated locally with a vendored library; nothing is sent anywhere.
+  document.addEventListener("click", function (e) {
+    const btn = e.target.closest("[data-qr-target]");
+    if (!btn || typeof qrcode === "undefined") return;
+    const payloadEl = document.getElementById(btn.dataset.qrTarget);
+    const box = document.getElementById("qr-" + btn.dataset.qrTarget.replace("pp-", ""));
+    if (!payloadEl || !box) return;
+    if (!box.hidden) { box.hidden = true; btn.setAttribute("aria-expanded", "false"); return; }
+    const doc = JSON.stringify({
+      type: "aw-passport", v: 1,
+      name: btn.dataset.qrName,
+      payload: JSON.parse(payloadEl.textContent),
+    });
+    const qr = qrcode(0, "M");
+    qr.addData(doc);
+    qr.make();
+    box.querySelectorAll("img").forEach((el) => el.remove());
+    box.insertAdjacentHTML("beforeend",
+      qr.createImgTag(4, 8, "QR code containing the " + btn.dataset.qrName + " Access Passport"));
+    box.hidden = false;
+    btn.setAttribute("aria-expanded", "true");
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}AccessWeave — turn any task into an accessible path{% endblock %}
+{% block main_class %}wide{% endblock %}
+{% block content %}
+
+{% if user.is_authenticated %}
+  <div class="greeting">
+    <h1>Welcome back{% if user.first_name %}, {{ user.first_name }}{% endif %}</h1>
+    <p class="lead muted">Choose an action below, or press the
+      <strong>Voice</strong> button and simply say it.</p>
+  </div>
+
+  {% if resume %}
+  <section class="card type-completion" aria-label="Continue where you left off">
+    <h2 style="margin-top:0">Pick up where you left off</h2>
+    <p><strong>{{ resume.goal }}</strong> — step {{ resume.current_step|add:1 }} of {{ resume.card_count }}.</p>
+    <div class="btn-row">
+      <a class="btn big" href="{% url 'task_player' pk=resume.pk %}?step={{ resume.current_step }}">Continue</a>
+      <a class="btn secondary" href="{% url 'task_player' pk=resume.pk %}?step={{ resume.current_step }}&voice=1">
+        <svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg> Continue hands-free</a>
+    </div>
+  </section>
+  {% endif %}
+
+  {% with rc=active_payload.cognitive.reduced_choice_mode %}
+  <nav class="hub" aria-label="Main actions">
+    <a class="tile primary" href="{% url 'task_new' %}">
+      <span class="tile-icon" aria-hidden="true"><svg class="icon"><use href="#i-plus"/></svg></span>
+      <h2>Start a task</h2>
+      <p>Speak, photograph, or paste something you're stuck on.</p>
+    </a>
+    <a class="tile" href="{% url 'look' %}">
+      <span class="tile-icon" aria-hidden="true"><svg class="icon"><use href="#i-eye"/></svg></span>
+      <h2>Look around</h2>
+      <p>Point the camera; hear what's in front of you.</p>
+    </a>
+    <a class="tile" href="{% url 'captions' %}">
+      <span class="tile-icon" aria-hidden="true"><svg class="icon"><use href="#i-monitor"/></svg></span>
+      <h2>Conversation</h2>
+      <p>Read their words as live captions; reply with speech.</p>
+    </a>
+    <a class="tile" href="{% url 'task_list' %}">
+      <span class="tile-icon" aria-hidden="true"><svg class="icon"><use href="#i-folder"/></svg></span>
+      <h2>My tasks</h2>
+      <p>Return to anything you've started — including routines.</p>
+    </a>
+    {% if not rc %}
+    <a class="tile" href="{% url 'soundwatch' %}">
+      <span class="tile-icon" aria-hidden="true"><svg class="icon"><use href="#i-bell"/></svg></span>
+      <h2>Sound Watch</h2>
+      <p>See and feel alerts when there's a sound you'd miss.</p>
+    </a>
+    <a class="tile" href="{% url 'communication' %}">
+      <span class="tile-icon" aria-hidden="true"><svg class="icon"><use href="#i-chat"/></svg></span>
+      <h2>Communicate</h2>
+      <p>Quick phrases, speech, and a card to show others.</p>
+    </a>
+    <a class="tile" href="{% url 'resources' %}">
+      <span class="tile-icon" aria-hidden="true"><svg class="icon"><use href="#i-tool"/></svg></span>
+      <h2>Find support</h2>
+      <p>Explainable, low-cost-first assistive options.</p>
+    </a>
+    <a class="tile" href="{% url 'passport_list' %}">
+      <span class="tile-icon" aria-hidden="true"><svg class="icon"><use href="#i-compass"/></svg></span>
+      <h2>My passport</h2>
+      <p>How you like things shown — text, speech, steps.</p>
+    </a>
+    <a class="tile" href="{% url 'privacy' %}">
+      <span class="tile-icon" aria-hidden="true"><svg class="icon"><use href="#i-shield"/></svg></span>
+      <h2>Privacy</h2>
+      <p>Delete anything. Nothing is shared without you.</p>
+    </a>
+    {% endif %}
+  </nav>
+  {% if rc %}
+  <p class="small muted" style="margin-top:0.8rem">Reduced-choice mode is on, so
+    only the essentials are shown. Everything else is still in the top menu, or
+    turn it off in <a href="{% url 'passport_list' %}">your passport</a>.</p>
+  {% endif %}
+  {% endwith %}
+
+  <p class="tip" style="margin-top:1.25rem">Say “new task”, “look around”,
+    “conversation mode”, “bigger text”, or “read the page”. Press
+    <kbd>Alt</kbd>+<kbd>V</kbd> to talk from any screen.</p>
+
+{% else %}
+  <section class="hero">
+    <h1>Turn any inaccessible task into a personalized, accessible path.</h1>
+    <p class="lead">Speak a goal, photograph a medicine label, or paste a confusing
+      form. AccessWeave finds the barriers and rebuilds the task into clear steps in
+      <em>your</em> format — large text, speech, plain language, one step at a time.
+      It asks what would make the task accessible to you, never your diagnosis.</p>
+    <div class="btn-row" style="margin-top:1.4rem">
+      <a class="btn big" href="{% url 'signup' %}">Get started — it's free</a>
+      <a class="btn secondary big" href="{% url 'login' %}">Log in</a>
+    </div>
+    <p class="small muted" style="margin-top:0.9rem">Demo access: <strong>demo</strong> / <strong>accessweave</strong></p>
+  </section>
+
+  <section class="hub" aria-label="What AccessWeave does" style="margin-top:1rem">
+    <div class="tile">
+      <span class="tile-icon" aria-hidden="true"><svg class="icon"><use href="#i-mic"/></svg></span>
+      <h2>Fully voice-controlled</h2>
+      <p>Navigate, read, and complete tasks entirely by voice — nothing to see or tap.</p></div>
+    <div class="tile">
+      <span class="tile-icon" aria-hidden="true"><svg class="icon"><use href="#i-layers"/></svg></span>
+      <h2>Compiles, not just describes</h2>
+      <p>It doesn't only flag what's inaccessible — it rebuilds it into steps you can do.</p></div>
+    <div class="tile">
+      <span class="tile-icon" aria-hidden="true"><svg class="icon"><use href="#i-shield"/></svg></span>
+      <h2>Private &amp; safe by design</h2>
+      <p>Photos read on-device, medical actions never automatic, delete anytime.</p></div>
+  </section>
+{% endif %}
+{% endblock %}

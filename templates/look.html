@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Look around — AccessWeave{% endblock %}
+{% block content %}
+<h1><svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg> Look around</h1>
+<p class="muted">Point your camera at what's in front of you and I'll say what I
+  see — with rough position (left, ahead, right). Everything runs
+  <strong>on your device</strong>: no video or photo is ever uploaded.</p>
+
+<div class="card">
+  <div style="position:relative;border-radius:12px;overflow:hidden;background:#000">
+    <video id="live-video" playsinline muted
+           style="width:100%;max-height:60vh;display:block;background:#000"
+           aria-label="Live camera view"></video>
+  </div>
+
+  <p id="live-status" class="hint" role="status" aria-live="polite"
+     style="margin-top:0.8rem">Press Start, then allow camera access.</p>
+
+  <div class="btn-row" style="margin-top:0.5rem">
+    <button class="btn big" id="live-start" type="button"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg> Start camera</button>
+    <button class="btn big" id="live-what" type="button" hidden><svg class="icon" aria-hidden="true"><use href="#i-speaker"/></svg> What do you see?</button>
+    <button class="btn secondary" id="live-stop" type="button" hidden><svg class="icon" aria-hidden="true"><use href="#i-stop"/></svg> Stop</button>
+    <button class="btn ghost" type="button" data-aw="stop-speak">Stop speech</button>
+  </div>
+</div>
+
+<section class="card">
+  <h2>Tips</h2>
+  <ul>
+    <li>Move the camera slowly — I re-describe the scene as it changes.</li>
+    <li>Ask any time with “What do you see?” (or say it out loud with the voice button).</li>
+    <li>I recognise everyday objects (people, furniture, cups, phones, vehicles, and more) — not fine detail or text. For text on a label, use <a href="{% url 'task_new' %}">Start a task</a> and the camera reader.</li>
+  </ul>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/vision-live.js' %}?v={{ aw_v }}" defer></script>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Conversation Mode — AccessWeave{% endblock %}
+{% block content %}
+<h1><svg class="icon" aria-hidden="true"><use href="#i-monitor"/></svg> Conversation Mode</h1>
+<p class="muted">They speak — you read it in big live captions. You reply with a
+  phrase or typed text — it's spoken aloud, or shown full-screen. The transcript
+  is <strong>never stored</strong>; it clears when you leave this page.</p>
+
+<div class="card">
+  <p id="cap-status" class="hint" role="status" aria-live="polite">
+    Press Start, then allow microphone access. Works best in Chrome or Edge.</p>
+  <div class="btn-row">
+    <button class="btn big" id="cap-start" type="button"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg> Start captions</button>
+    <button class="btn secondary" id="cap-stop" type="button" hidden><svg class="icon" aria-hidden="true"><use href="#i-stop"/></svg> Stop</button>
+    <button class="btn ghost" id="cap-clear" type="button">Clear</button>
+    <button class="btn ghost" id="cap-smaller" type="button">A−</button>
+    <button class="btn ghost" id="cap-bigger" type="button">A+</button>
+  </div>
+
+  <div id="cap-out" aria-live="off"
+       style="min-height:9rem;max-height:45vh;overflow-y:auto;margin-top:1rem;
+              font-size:1.6rem;line-height:1.5;font-weight:600"></div>
+  <p id="cap-interim" class="muted" style="font-size:1.6rem;min-height:2rem;font-style:italic"></p>
+</div>
+
+<section class="card">
+  <h2>Your reply</h2>
+  <label for="composer" class="sr-only">Your message</label>
+  <textarea id="composer" rows="2" placeholder="Type here, or tap a phrase below."></textarea>
+  <div class="btn-row" style="margin-top:0.6rem">
+    <button class="btn" type="button" onclick="awSpeak(document.getElementById('composer').value)"><svg class="icon" aria-hidden="true"><use href="#i-speaker"/></svg> Speak it</button>
+    <button class="btn secondary" type="button" data-partner-open><svg class="icon" aria-hidden="true"><use href="#i-monitor"/></svg> Show full-screen</button>
+    <button class="btn ghost" type="button" data-aw="stop-speak"><svg class="icon" aria-hidden="true"><use href="#i-stop"/></svg> Stop</button>
+    <button class="btn ghost" type="button" onclick="document.getElementById('composer').value=''">Clear</button>
+  </div>
+  <div class="grid" style="margin-top:1rem">
+    <button class="phrase" type="button" data-phrase="Please speak one at a time."><span class="symbol" aria-hidden="true">🗣️</span> Please speak one at a time.</button>
+    <button class="phrase" type="button" data-phrase="Please face me while you speak."><span class="symbol" aria-hidden="true">🙂</span> Please face me while you speak.</button>
+    <button class="phrase" type="button" data-phrase="Could you repeat that more slowly?"><span class="symbol" aria-hidden="true">🐢</span> Could you repeat that more slowly?</button>
+    <button class="phrase" type="button" data-phrase="Please give me a moment to reply."><span class="symbol" aria-hidden="true">⏳</span> Please give me a moment to reply.</button>
+    <button class="phrase" type="button" data-phrase="Thank you."><span class="symbol" aria-hidden="true">🙏</span> Thank you.</button>
+  </div>
+  <p class="hint" style="margin-top:0.8rem">More phrases in the
+    <a href="{% url 'communication' %}">Communication Bridge</a>.</p>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/captions.js' %}?v={{ aw_v }}" defer></script>
+{% endblock %}

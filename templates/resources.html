@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Resource Matcher — AccessWeave{% endblock %}
+{% block main_class %}wide{% endblock %}
+{% block content %}
+<h1>Assistive Resource Matcher</h1>
+<p class="muted">Explainable, low-cost-first suggestions. This does not diagnose,
+prescribe, or guarantee eligibility.</p>
+
+<form method="post" class="card">
+  {% csrf_token %}
+  <div class="field">
+    <label for="goal">What would you like to do?</label>
+    <input type="text" name="goal" id="goal" value="{{ goal }}"
+           placeholder="e.g. Use my phone with less hand movement">
+  </div>
+  <fieldset>
+    <legend>Which barriers apply? (optional)</legend>
+    <div class="choice-grid">
+      {% for cat in taxonomy.keys %}
+        <label class="choice"><input type="checkbox" name="barriers" value="{{ cat }}"> {{ cat|capfirst }}</label>
+      {% endfor %}
+    </div>
+  </fieldset>
+  <label class="choice" style="max-width:26rem">
+    <input type="checkbox" name="affordability"> Cost is a major concern (prioritize free / low-cost)
+  </label>
+  <div style="margin-top:1rem"><button class="btn big" type="submit">Find options</button></div>
+</form>
+
+{% if result %}
+  <h2>Suggestions</h2>
+  <div class="stack">
+  {% for r in result.recommendations %}
+    <div class="card" style="margin:0">
+      <div class="btn-row" style="justify-content:space-between;align-items:center">
+        <h3 style="margin:0">{{ r.label }}</h3>
+        <span class="chip">{{ r.cost_band|capfirst }} cost · confidence {{ r.confidence }}</span>
+      </div>
+      <p>{{ r.why }}</p>
+      <p class="small"><strong>Why this, for you:</strong> {{ r.because|join:"; " }}.</p>
+      {% if r.prerequisites %}<p class="small muted">Needs: {{ r.prerequisites|join:", " }}.</p>{% endif %}
+      <p class="small muted">Training: {{ r.training }}</p>
+      <p class="small"><strong>Alternatives:</strong> {{ r.alternatives|join:", " }}.</p>
+      <p class="small"><strong>Limitations:</strong> {{ r.limitations|join:" " }}</p>
+      <p class="small muted">Where: {{ r.pathways|join:"; " }}. Verified {{ r.verified_on }}.</p>
+    </div>
+  {% empty %}
+    <div class="card"><p>No matches — try describing your goal or selecting a barrier.</p></div>
+  {% endfor %}
+  </div>
+  <div class="alert" role="note" style="margin-top:1rem">
+    <p style="margin:0"><strong>Important.</strong> {{ result.disclaimer }}</p>
+    <p class="small muted" style="margin:0.4rem 0 0">{{ result.population_note }}</p>
+  </div>
+{% endif %}
+{% endblock %}

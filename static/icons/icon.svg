@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="AccessWeave">
+  <rect width="512" height="512" rx="96" fill="#1b5fd6"/>
+  <circle cx="256" cy="150" r="46" fill="#ffffff"/>
+  <path d="M256 210c-70 0-120 30-120 30l24 44s34-22 72-28v52l-52 96 44 22 32-70 32 70 44-22-52-96v-52c38 6 72 28 72 28l24-44s-50-30-120-30z" fill="#ffffff"/>
+</svg>

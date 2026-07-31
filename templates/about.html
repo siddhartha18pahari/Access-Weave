@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}About — AccessWeave{% endblock %}
+{% block main_class %}wide{% endblock %}
+{% block content %}
+<h1>About AccessWeave</h1>
+<p class="lead">Accessibility as compilation: turn any inaccessible task into a
+personalized, accessible path to completion.</p>
+
+<section class="card">
+  <h2>The problem</h2>
+  <p>People with disabilities face an accumulation of small barriers — a label that
+  can't be read, a form written in dense language, a step that assumes a phone
+  call. Most tools solve one modality (a screen reader reads; OCR extracts). The
+  burden of stitching them together still falls on the disabled person.</p>
+</section>
+
+<section class="card">
+  <h2>Our approach</h2>
+  <p>AccessWeave treats accessibility as an end-to-end task-completion problem. It
+  asks not “what is your diagnosis?” but “what would make this task accessible to
+  you?” Then it <strong>compiles</strong> the task — parses the source, detects
+  barriers, builds an explainable task graph, applies your Access Passport, and
+  renders validated Access Cards in your preferred format.</p>
+</section>
+
+<section class="card">
+  <h2>What makes it different</h2>
+  <ul>
+    <li>Adapts to the <em>task</em>, not a diagnosis label.</li>
+    <li><em>Transforms</em> experiences instead of only detecting problems.</li>
+    <li>Unifies digital and physical accessibility.</li>
+    <li>Preserves user agency — consequential actions always require confirmation.</li>
+    <li>Works in degraded conditions: a deterministic engine runs offline, with no paid API.</li>
+    <li>Measures independence, not engagement.</li>
+  </ul>
+</section>
+
+<section class="card">
+  <h2>Built to be accessible itself</h2>
+  <p>AccessWeave targets WCAG 2.2 AA: full keyboard operation, visible focus, skip
+  links, semantic landmarks, no color-only status, text resizing to 300%, reduced
+  motion, high contrast, light/dark themes, and screen-reader announcements. Every
+  page works without JavaScript; JavaScript only enhances it.</p>
+  <a class="btn" href="{% url 'signup' %}">Get started</a>
+</section>
+{% endblock %}

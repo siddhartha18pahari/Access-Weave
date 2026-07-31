@@ -1,0 +1,211 @@
+{% load static %}<!doctype html>
+<html lang="en"
+      {% if active_payload.output.contrast and active_payload.output.contrast != 'system' %}data-contrast="{{ active_payload.output.contrast }}"{% endif %}
+      data-reduced-motion="{{ active_payload.output.reduced_motion|yesno:'true,false' }}"
+      data-reading-ruler="{{ active_payload.output.reading_ruler|yesno:'true,false' }}"
+      data-symbols="{{ active_payload.output.symbols_with_text|yesno:'true,false' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="AccessWeave turns any inaccessible task into a personalized, accessible path to completion.">
+  <meta name="theme-color" content="#2358e0">
+  <title>{% block title %}AccessWeave{% endblock %}</title>
+  <link rel="icon" href="{% static 'icons/icon.svg' %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% static 'icons/icon.svg' %}">
+  <link rel="manifest" href="{% url 'manifest' %}">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v={{ aw_v }}">
+  <link rel="stylesheet" href="{% static 'css/accessibility.css' %}?v={{ aw_v }}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}?v={{ aw_v }}">
+  {% if active_payload %}{{ active_payload|json_script:"aw-passport" }}{% endif %}
+</head>
+<body data-tts="{{ aw_tts_enabled|yesno:'on,off' }}">
+  {% include "partials/icons.svg" %}
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <div class="ruler" aria-hidden="true"></div>
+
+  <div id="offline-banner" class="alert" role="status" hidden
+       style="border-radius:0;margin:0;text-align:center">
+    You are offline. Your active passport, saved phrases, and recent cards still work.
+  </div>
+
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="{% url 'home' %}">
+        <span class="logo" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8c3 0 3 8 6 8s3-8 6-8"/></svg>
+        </span>
+        AccessWeave
+      </a>
+      <nav class="main" aria-label="Primary">
+        <button class="theme-toggle" data-theme-toggle type="button"
+                aria-pressed="false" aria-label="Switch between light and dark theme">
+          <span class="ti-moon" aria-hidden="true"><svg class="icon"><use href="#i-moon"/></svg></span>
+          <span class="ti-sun" aria-hidden="true"><svg class="icon"><use href="#i-sun"/></svg></span>
+        </button>
+        {% if user.is_authenticated %}
+          <a href="{% url 'task_new' %}" {% if request.resolver_match.url_name == 'task_new' %}aria-current="page"{% endif %}>New task</a>
+          <a href="{% url 'communication' %}" {% if request.resolver_match.url_name == 'communication' %}aria-current="page"{% endif %}>Communicate</a>
+          <a href="{% url 'resources' %}" {% if request.resolver_match.url_name == 'resources' %}aria-current="page"{% endif %}>Resources</a>
+          <a href="{% url 'passport_list' %}" {% if request.resolver_match.url_name == 'passport_list' %}aria-current="page"{% endif %}>Passport</a>
+          <button class="pal-trigger" data-palette-open type="button" aria-label="Open command palette. Shortcut: Control or Command plus K"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg> <kbd>⌘K</kbd></button>
+          <form action="{% url 'logout' %}" method="post" style="display:inline">{% csrf_token %}
+            <button class="linklike" type="submit">Log out</button>
+          </form>
+        {% else %}
+          <a href="{% url 'about' %}">About</a>
+          <a href="{% url 'privacy' %}">Privacy</a>
+          <a href="{% url 'login' %}">Log in</a>
+          <a class="btn" href="{% url 'signup' %}">Get started</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  {% if user.is_authenticated %}
+  <details class="display-menu">
+    <summary><svg class="icon" aria-hidden="true"><use href="#i-sliders"/></svg> Display &amp; reading options</summary>
+    <div class="display-menu-body">
+      <div class="theme-group" role="group" aria-label="Colour theme">
+        <span class="small muted">Theme:</span>
+        <button class="tbtn" data-theme="light" type="button" aria-pressed="false">Light</button>
+        <button class="tbtn" data-theme="dark" type="button" aria-pressed="false">Dark</button>
+        <button class="tbtn" data-theme="high" type="button" aria-pressed="false">High contrast</button>
+      </div>
+      <div class="theme-group" role="group" aria-label="Text, motion and audio">
+        <button class="tbtn" data-aw="text-smaller" type="button">A− Smaller text</button>
+        <button class="tbtn" data-aw="text-larger" type="button">A+ Bigger text</button>
+        <button class="tbtn" data-aw="motion" type="button"
+                aria-pressed="{{ active_payload.output.reduced_motion|yesno:'true,false' }}">Reduce motion</button>
+        <button class="tbtn" data-aw="guide" type="button" aria-pressed="false">
+          <svg class="icon" aria-hidden="true"><use href="#i-speaker"/></svg> Audio guide</button>
+        <button class="tbtn" data-aw="focus" type="button" aria-pressed="false">
+          <svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg> Focus mode</button>
+        <button class="tbtn" data-aw="stop-speak" type="button">
+          <svg class="icon" aria-hidden="true"><use href="#i-stop"/></svg> Stop speech</button>
+      </div>
+      <div class="theme-group" role="group" aria-label="Alternative input">
+        <span class="small muted">Input:</span>
+        <button class="tbtn" data-scan-toggle="switch" type="button" aria-pressed="false">
+          Switch scanning</button>
+        <button class="tbtn" data-scan-toggle="dwell" type="button" aria-pressed="false">
+          Dwell selection</button>
+        <button class="tbtn" data-shortcuts-open type="button">
+          Keyboard shortcuts <kbd>?</kbd></button>
+      </div>
+    </div>
+  </details>
+  {% endif %}
+
+  <main id="main" class="container {% block main_class %}{% endblock %}" tabindex="-1">
+    {% if messages %}
+      <div aria-live="polite">
+      {% for message in messages %}
+        <div class="alert {{ message.tags }}" role="status">{{ message }}</div>
+      {% endfor %}
+      </div>
+    {% endif %}
+    <div id="aw-live" class="sr-only" aria-live="polite" role="status"></div>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="container wide footer-grid">
+      <div>
+        <p class="brandline">
+          <span class="logo brand-logo" aria-hidden="true" style="display:inline-grid;place-items:center;width:1.6rem;height:1.6rem;border-radius:7px;background:linear-gradient(135deg,var(--aw-primary),var(--aw-accent));color:var(--aw-primary-text)">
+            <svg class="icon" viewBox="0 0 24 24" style="width:0.95rem;height:0.95rem" aria-hidden="true"><path d="M6 8c3 0 3 8 6 8s3-8 6-8"/></svg>
+          </span>
+          AccessWeave
+        </p>
+        <p class="muted small">The adaptive independence copilot. Your passport
+        describes preferences, never a diagnosis. Nothing is sent or shared
+        without your confirmation.</p>
+      </div>
+      <nav aria-label="Product">
+        <h3>Product</h3>
+        <ul>
+          <li><a href="{% url 'task_new' %}">Start a task</a></li>
+          <li><a href="{% url 'communication' %}">Communication Bridge</a></li>
+          <li><a href="{% url 'resources' %}">Resource Matcher</a></li>
+          <li><a href="{% url 'passport_list' %}">Access Passport</a></li>
+        </ul>
+      </nav>
+      <nav aria-label="Trust">
+        <h3>Trust</h3>
+        <ul>
+          <li><a href="{% url 'about' %}">About</a></li>
+          <li><a href="{% url 'privacy' %}">Privacy &amp; safety</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="container wide footer-bottom">
+      <p style="margin:0">© 2026 AccessWeave · v1.0 · Built for the Assistive Innovation Challenge 2026</p>
+    </div>
+  </footer>
+
+  {% if user.is_authenticated %}
+  <button id="voice-fab" class="voice-fab" type="button" aria-pressed="false"
+          aria-label="Voice control. Press to talk to AccessWeave, or press Alt plus V.">
+    <svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg>
+    <span id="voice-fab-status" class="voice-fab-label">Voice</span>
+  </button>
+  {% endif %}
+
+  {% if user.is_authenticated %}
+  <div id="aw-shortcuts" class="shortcuts" role="dialog" aria-modal="true"
+       aria-labelledby="aw-shortcuts-h" hidden>
+    <div class="shortcuts-panel">
+      <h2 id="aw-shortcuts-h">Keyboard &amp; switch shortcuts</h2>
+      <dl>
+        <dt><kbd>Ctrl</kbd>/<kbd>&#8984;</kbd>+<kbd>K</kbd></dt><dd>Open the command palette</dd>
+        <dt><kbd>Alt</kbd>+<kbd>V</kbd></dt><dd>Turn voice control on or off</dd>
+        <dt><kbd>Alt</kbd>+<kbd>R</kbd></dt><dd>Read this page aloud</dd>
+        <dt><kbd>Alt</kbd>+<kbd>F</kbd></dt><dd>Focus mode — quiet everything but the task</dd>
+        <dt><kbd>Alt</kbd>+<kbd>S</kbd></dt><dd>Switch scanning — highlight steps through controls</dd>
+        <dt><kbd>Alt</kbd>+<kbd>D</kbd></dt><dd>Dwell selection — rest the pointer to choose</dd>
+        <dt><kbd>?</kbd></dt><dd>Show this list</dd>
+        <dt><kbd>Esc</kbd></dt><dd>Close, or stop scanning / dwell</dd>
+        <dt><kbd>Tab</kbd></dt><dd>Move through the page as normal</dd>
+      </dl>
+      <p class="small muted">While switch scanning, <strong>any key, click, or
+        controller button</strong> chooses the highlighted control — most
+        assistive switches work without extra software.</p>
+      <button class="btn" data-shortcuts-close type="button">Close</button>
+    </div>
+  </div>
+
+  <div id="aw-palette" class="palette" role="dialog" aria-modal="true"
+       aria-label="Command palette" hidden>
+    <div class="palette-panel">
+      <div class="palette-field">
+        <svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg>
+        <label for="aw-palette-input" class="sr-only">Search commands</label>
+        <input id="aw-palette-input" type="text" role="combobox" autocomplete="off"
+               aria-expanded="true" aria-controls="aw-palette-list"
+               placeholder="Type a command… e.g. look around, dark theme">
+        <kbd>Esc</kbd>
+      </div>
+      <ul id="aw-palette-list" class="palette-list" role="listbox"
+          aria-label="Commands"></ul>
+      <p id="aw-palette-empty" class="palette-empty" hidden>No matching command.</p>
+    </div>
+  </div>
+  {% endif %}
+
+  <div id="partner-card" class="partner-card" role="dialog" aria-modal="true"
+       aria-label="Message for the person you're talking to" tabindex="-1" aria-hidden="true">
+    <div>
+      <p>…</p>
+      <button class="btn big" data-partner-close type="button">Close</button>
+    </div>
+  </div>
+
+  <script src="{% static 'js/tts-client.js' %}?v={{ aw_v }}" defer></script>
+  <script src="{% static 'js/app.js' %}?v={{ aw_v }}" defer></script>
+  {% if user.is_authenticated %}<script src="{% static 'js/voice.js' %}?v={{ aw_v }}" defer></script>{% endif %}
+  {% if user.is_authenticated %}<script src="{% static 'js/palette.js' %}?v={{ aw_v }}" defer></script>{% endif %}
+  {% if user.is_authenticated %}<script src="{% static 'js/assist.js' %}?v={{ aw_v }}" defer></script>{% endif %}
+  {% if user.is_authenticated %}<script src="{% static 'js/scan.js' %}?v={{ aw_v }}" defer></script>{% endif %}
+  {% block scripts %}{% endblock %}
+</body>
+</html>

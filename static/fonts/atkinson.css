@@ -1,0 +1,32 @@
+/* Atkinson Hyperlegible — a typeface designed by the Braille Institute to
+   maximize character distinction and legibility for low-vision readers.
+   Vendored locally so it also works fully offline. Licensed under the
+   Atkinson Hyperlegible Font License (free for commercial and personal use). */
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("atkinson/AtkinsonHyperlegible-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("atkinson/AtkinsonHyperlegible-Bold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("atkinson/AtkinsonHyperlegible-Italic.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url("atkinson/AtkinsonHyperlegible-BoldItalic.ttf") format("truetype");
+}

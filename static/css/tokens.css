@@ -1,0 +1,116 @@
+/* AccessWeave design tokens.
+   The Access Passport personalizes the whole UI by setting these variables and
+   data-* attributes on <html> — no separate page templates, no duplicated CSS. */
+
+@import url("../fonts/atkinson.css");
+
+:root {
+  /* Atkinson Hyperlegible: designed for low-vision legibility. System stack
+     is the fallback if the webfont hasn't loaded. */
+  --aw-font: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI",
+             Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* personalization knobs (driven by the passport) */
+  --aw-text-scale: 1;
+  --aw-line-height: 1.65;
+  --aw-letter-spacing: 0.01em;
+  --aw-word-spacing: 0.02em;
+  --aw-target-size: 44px;
+  --aw-card-gap: 1rem;
+  --aw-motion-duration: 180ms;
+  --aw-radius: 16px;
+  --aw-content-width: 46rem;
+
+  /* Light theme palette (default) — calm, warm, high legibility */
+  --aw-bg: #f4f7fc;
+  --aw-surface: #ffffff;
+  --aw-surface-2: #eaf0fa;
+  --aw-text: #16213b;
+  --aw-text-muted: #55617a;
+  --aw-border: #d9e1ef;
+  --aw-primary: #2358e0;
+  --aw-primary-text: #ffffff;
+  --aw-accent: #3565d6;             /* dark enough for white text (≥4.5:1) */
+  --aw-focus: #c81d77;              /* strong magenta — never yellow */
+  --aw-success: #0c7a49;
+  --aw-warning-bg: #fff4dd;
+  --aw-warning-border: #cf8a00;
+  --aw-warning-text: #6a4b00;
+  --aw-danger: #c3202f;
+  --aw-danger-text: #ffffff;        /* readable ON the danger colour, per theme */
+  --aw-shadow: 0 1px 2px rgba(19,26,36,.05), 0 8px 24px rgba(19,26,36,.07);
+  --aw-hero-1: #eef4ff;
+  --aw-hero-2: #f6f0ff;
+}
+
+/* The DEFAULT is the light blue/white theme above. Dark and high-contrast are
+   opt-in only (the OS dark-mode preference no longer forces a dark theme, so a
+   fresh visit is always blue and white). */
+
+:root[data-contrast="dark"] {
+  --aw-bg: #0f1522;
+  --aw-surface: #19212f;
+  --aw-surface-2: #232d3f;
+  --aw-text: #e9eef7;
+  --aw-text-muted: #a6b2c6;
+  --aw-border: #2f3b52;
+  --aw-primary: #6f9bff;
+  --aw-primary-text: #071127;
+  --aw-accent: #6f9bff;
+  --aw-focus: #38d0ff;
+  --aw-success: #4ed6a2;
+  --aw-warning-bg: #2a2517;
+  --aw-warning-border: #d7a94a;
+  --aw-warning-text: #f0dca6;
+  --aw-danger: #ff7a8c;
+  --aw-danger-text: #2b060d;        /* dark text on the light pink danger */
+  --aw-shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.45);
+  --aw-hero-1: #17203a;
+  --aw-hero-2: #1c1a34;
+}
+
+/* Explicit Light (forces light even if the OS is in dark mode). */
+:root[data-contrast="light"] {
+  --aw-bg: #f4f7fc;
+  --aw-surface: #ffffff;
+  --aw-surface-2: #eaf0fa;
+  --aw-text: #16213b;
+  --aw-text-muted: #55617a;
+  --aw-border: #d9e1ef;
+  --aw-primary: #2358e0;
+  --aw-primary-text: #ffffff;
+  --aw-accent: #3565d6;
+  --aw-focus: #c81d77;
+  --aw-success: #0c7a49;
+  --aw-warning-bg: #fff4dd;
+  --aw-warning-border: #cf8a00;
+  --aw-warning-text: #6a4b00;
+  --aw-danger: #c3202f;
+  --aw-danger-text: #ffffff;
+  --aw-shadow: 0 1px 2px rgba(19,26,36,.05), 0 8px 24px rgba(19,26,36,.07);
+  --aw-hero-1: #eef4ff;
+  --aw-hero-2: #f6f0ff;
+}
+
+/* --- High contrast: opt-in only. Maximum legibility (black/yellow by design). */
+:root[data-contrast="high"] {
+  --aw-bg: #000000;
+  --aw-surface: #000000;
+  --aw-surface-2: #0a0a0a;
+  --aw-text: #ffffff;
+  --aw-text-muted: #ffffff;
+  --aw-border: #ffffff;
+  --aw-primary: #ffff00;
+  --aw-primary-text: #000000;
+  --aw-accent: #ffff00;
+  --aw-focus: #00e5ff;
+  --aw-success: #00ff9c;
+  --aw-warning-bg: #000000;
+  --aw-warning-border: #ffff00;
+  --aw-warning-text: #ffff00;
+  --aw-danger: #ff6b6b;
+  --aw-danger-text: #000000;
+  --aw-shadow: none;
+  --aw-hero-1: #000000;
+  --aw-hero-2: #000000;
+}

@@ -1,0 +1,22 @@
+# AccessWeave — single-service deployment.
+# The app runs on SQLite with the deterministic engine (no external services
+# required). Optional ElevenLabs voice is enabled by setting ELEVENLABS_API_KEY.
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_DEBUG: "0"
+      DJANGO_SECRET_KEY: "${DJANGO_SECRET_KEY:-change-me-in-production}"
+      DJANGO_ALLOWED_HOSTS: "${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}"
+      DJANGO_SSL_REDIRECT: "0"
+      # Keep the SQLite DB on the mounted volume so it persists across restarts.
+      SQLITE_PATH: "/app/data/db.sqlite3"
+      # Optional natural voice (free tier): put your key here or in a .env file.
+      ELEVENLABS_API_KEY: "${ELEVENLABS_API_KEY:-}"
+    volumes:
+      - aw_data:/app/data
+
+volumes:
+  aw_data:

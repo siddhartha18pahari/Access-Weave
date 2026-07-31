@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Communication Bridge — AccessWeave{% endblock %}
+{% block main_class %}wide{% endblock %}
+{% block content %}
+<h1>Communication Bridge</h1>
+<p class="muted">Tap phrases to build a message. Read it aloud, or show it
+full-screen to the person you're talking to. Your microphone stays off.</p>
+
+<div class="card">
+  <label for="composer">Your message</label>
+  <textarea id="composer" rows="2" placeholder="Tap phrases below, or type here."></textarea>
+  <div class="btn-row" style="margin-top:0.6rem">
+    <button class="btn big" type="button" data-partner-open><svg class="icon" aria-hidden="true"><use href="#i-monitor"/></svg> Show full-screen</button>
+    <button class="btn secondary" type="button" onclick="awSpeak(document.getElementById('composer').value)"><svg class="icon" aria-hidden="true"><use href="#i-speaker"/></svg> Speak it</button>
+    <button class="btn ghost" type="button" data-aw="stop-speak"><svg class="icon" aria-hidden="true"><use href="#i-stop"/></svg> Stop</button>
+    <button class="btn ghost" type="button" onclick="document.getElementById('composer').value=''">Clear</button>
+  </div>
+</div>
+
+<div class="card" style="border-color:var(--aw-warning-border)">
+  <button class="btn big" type="button"
+          data-partner-open="Please give me more time to respond. Thank you.">
+    <span class="symbol" aria-hidden="true">⏳</span> Please give me more time
+  </button>
+  <p class="small muted" style="margin-bottom:0">A low-pressure repair prompt for high-stress moments.</p>
+</div>
+
+{% for pack, items in packs.items %}
+<section class="card">
+  <h2 style="text-transform:capitalize">{{ pack }} phrases</h2>
+  <div class="grid">
+    {% for it in items %}
+      <button class="phrase" type="button" data-phrase="{{ it.text }}">
+        <span class="symbol" aria-hidden="true">{{ it.symbol }}</span> {{ it.text }}
+      </button>
+    {% endfor %}
+  </div>
+</section>
+{% endfor %}
+
+<section class="card">
+  <h2>Your saved phrases</h2>
+  {% if custom %}
+  <div class="grid" style="margin-bottom:1rem">
+    {% for it in custom %}
+      <div class="btn-row" style="align-items:center">
+        <button class="phrase" type="button" data-phrase="{{ it.text }}" style="flex:1">
+          <span class="symbol" aria-hidden="true">{{ it.symbol }}</span> {{ it.text }}
+        </button>
+        <form method="post" action="{% url 'phrase_delete' pk=it.id %}">{% csrf_token %}
+          <button class="btn ghost" type="submit" aria-label="Delete phrase"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+        </form>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <form method="post" action="{% url 'phrase_add' %}" class="btn-row" style="align-items:flex-end">
+    {% csrf_token %}
+    <div class="field" style="flex:1;margin:0">
+      <label for="newphrase">Add a phrase</label>
+      <input type="text" name="text" id="newphrase" maxlength="200" placeholder="e.g. Please face me when you speak.">
+    </div>
+    <button class="btn" type="submit">Save</button>
+  </form>
+</section>
+{% endblock %}

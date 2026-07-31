@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ session.goal }} — AccessWeave{% endblock %}
+{% block content %}
+{% with c=current_payload %}
+<div id="voice-data"
+     data-step="{{ step }}" data-total="{{ total }}"
+     data-base="{% url 'task_player' pk=session.pk %}"
+     data-speakable="{{ c.speakable }}" hidden></div>
+
+<nav aria-label="Task" class="btn-row" style="justify-content:space-between;align-items:center">
+  <a class="btn ghost" href="{% url 'task_list' %}">← All tasks</a>
+  <a class="btn secondary" href="{% url 'task_analysis' pk=session.pk %}">Why these steps?</a>
+</nav>
+
+<h1 style="margin-bottom:0.3rem">{{ session.goal }}</h1>
+
+{% if active_payload.cognitive.show_progress|default:True %}
+<p class="small muted" id="progresslabel">Step {{ step|add:1 }} of {{ total }}</p>
+<div class="progress" role="progressbar" aria-labelledby="progresslabel"
+     aria-valuenow="{{ step|add:1 }}" aria-valuemin="1" aria-valuemax="{{ total }}">
+  <span style="width:{{ progress_pct }}%"></span>
+</div>
+{% endif %}
+
+<article class="card play-card type-{{ c.type }}" data-speakable="{{ c.speakable }}"
+         data-autospeak="{{ c.speakable }}" aria-live="polite" style="margin-top:1rem">
+  <div class="btn-row" style="justify-content:space-between;align-items:flex-start">
+    <span class="badge">{{ c.type|capfirst }}</span>
+    {% if c.confidence and c.confidence < 0.7 or c.provenance.uncertain %}
+      <span class="badge uncertain"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg> Please verify — read from a source</span>
+    {% endif %}
+  </div>
+
+  <h2 style="margin-top:0.6rem">{{ c.title }}</h2>
+
+  {% if c.type == 'warning' %}
+    <p style="font-size:1.2rem;font-weight:700">{{ c.content.plain_text }}</p>
+    <p class="small">This is shown exactly as it was written. AccessWeave never changes a safety instruction.</p>
+  {% else %}
+    {% if c.content.plain_text %}<p style="font-size:1.1rem">{{ c.content.plain_text }}</p>{% endif %}
+  {% endif %}
+
+  {% if c.content.structured_values %}
+    <dl class="kv">
+      {% for k,v in c.content.structured_values.items %}
+        <dt>{{ k }}</dt><dd>{{ v }}</dd>
+      {% endfor %}
+    </dl>
+  {% endif %}
+
+  {% if c.content.items %}
+    <ul>{% for it in c.content.items %}<li>{{ it.label|default:it }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  {% if c.recovery %}
+    <p class="small muted"><svg class="icon" aria-hidden="true"><use href="#i-undo"/></svg> {{ c.recovery }}</p>
+  {% endif %}
+
+  {% if c.provenance.source_type %}
+    <p class="small muted">Source: {{ c.provenance.source_type }}{% if c.confidence %} · confidence {{ c.confidence|floatformat:2 }}{% endif %}</p>
+  {% endif %}
+
+  <div class="btn-row" style="margin-top:1rem">
+    <button class="btn secondary" type="button" data-aw="speak" data-text="{{ c.speakable }}"><svg class="icon" aria-hidden="true"><use href="#i-speaker"/></svg> Read aloud</button>
+    <button class="btn ghost" type="button" data-aw="stop-speak"><svg class="icon" aria-hidden="true"><use href="#i-stop"/></svg> Stop</button>
+    {% if c.type != 'warning' and c.content.plain_text %}
+      <a class="btn ghost" href="?step={{ step }}&amp;simplify=1#main">Simpler wording</a>
+    {% endif %}
+  </div>
+
+  {% if c.requires_confirmation %}
+    <div class="card" style="margin-top:1rem;border-color:var(--aw-warning-border)">
+      <h3>Please confirm</h3>
+      {% if c.content.structured_values %}{% else %}
+      <p>{{ c.content.plain_text }}</p>
+      {% endif %}
+      <form method="post" action="{% url 'task_action' pk=session.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="complete_step">
+        <div class="btn-row">
+          <button class="btn" type="submit" data-haptic>Yes, I confirm</button>
+          {% if next_step is not None %}
+            <a class="btn ghost" href="?step={{ next_step }}">Skip for now</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+  {% endif %}
+</article>
+
+<nav class="btn-row" aria-label="Steps" style="justify-content:space-between;margin-top:0.5rem">
+  {% if prev_step is not None %}
+    <a class="btn secondary big" href="?step={{ prev_step }}">← Previous</a>
+  {% else %}<span></span>{% endif %}
+
+  {% if next_step is not None %}
+    <form method="post" action="{% url 'task_action' pk=session.pk %}" style="display:inline">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="complete_step">
+      <button class="btn big" type="submit" data-haptic>Mark done &amp; next →</button>
+    </form>
+  {% else %}
+    <form method="post" action="{% url 'task_action' pk=session.pk %}" style="display:inline">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="complete_task">
+      <button class="btn big" id="voice-finish" type="submit" data-haptic><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> Finish task</button>
+    </form>
+  {% endif %}
+</nav>
+
+<div class="card" style="margin-top:1.5rem">
+  <div class="btn-row" style="justify-content:space-between;align-items:center">
+    <div>
+      <strong>Was this helpful?</strong>
+      <span class="small muted">Tunes your preferences, not a diagnosis.</span>
+    </div>
+    <form method="post" action="{% url 'task_action' pk=session.pk %}" class="btn-row">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="feedback">
+      <button class="btn ghost" name="helpful" value="yes" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-thumb-up"/></svg> Yes</button>
+      <button class="btn ghost" name="helpful" value="no" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-thumb-down"/></svg> Not really</button>
+    </form>
+  </div>
+</div>
+
+<div class="btn-row" style="margin-top:1rem">
+  <form method="post" action="{% url 'task_action' pk=session.pk %}">
+    {% csrf_token %}<input type="hidden" name="action" value="pause">
+    <button class="btn ghost" type="submit">Pause &amp; save</button>
+  </form>
+  <form method="post" action="{% url 'task_delete' pk=session.pk %}"
+        onsubmit="return confirm('Delete this task and its source? This cannot be undone.')">
+    {% csrf_token %}
+    <button class="btn danger" type="submit">Delete task &amp; source</button>
+  </form>
+</div>
+{% endwith %}
+{% endblock %}
+{% block scripts %}
+<script>
+  // Announce step changes to screen readers.
+  var live = document.getElementById("aw-live");
+  if (live) live.textContent = "Step {{ step|add:1 }} of {{ total }}: {{ current_payload.title|escapejs }}";
+</script>
+{% endblock %}

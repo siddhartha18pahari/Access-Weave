@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Population evidence — AccessWeave{% endblock %}
+{% block main_class %}wide{% endblock %}
+{% block content %}
+<h1>Population evidence layer</h1>
+<p class="muted">A de-identified, aggregate view used only to <em>nudge</em> resource
+ranking. It never profiles an individual, and this build uses a small,
+self-contained sample — not anyone's personal data.</p>
+
+<section class="card">
+  <h2>Commonly reported unmet-need areas</h2>
+  <p class="small muted">Higher bars = more frequently reported as an unmet need in the reference sample. Minimum group size for any figure: {{ min_group }}.</p>
+  <div class="stack" style="margin-top:1rem">
+    {% for row in rows %}
+      <div>
+        <div class="btn-row" style="justify-content:space-between">
+          <strong style="text-transform:capitalize">{{ row.category }}</strong>
+          <span class="small muted">{{ row.weight }}</span>
+        </div>
+        <div class="bar-meter"><span style="width:{{ row.weight }}%"></span></div>
+      </div>
+    {% endfor %}
+  </div>
+  <p class="small muted" style="margin-top:1rem">Verified {{ verified_on }}. Aggregate, de-identified, no raw records in the application.</p>
+</section>
+
+<section class="card">
+  <h2>How this connects to your tasks</h2>
+  <ul>
+    <li>When “cannot afford” is common in a domain, the Resource Matcher prefers free / low-cost options.</li>
+    <li>When a service is hard to obtain in an area, AccessWeave can say so transparently.</li>
+    <li>Population patterns inform ranking only — they never determine what's right for you.</li>
+  </ul>
+  <a class="btn secondary" href="{% url 'resources' %}">Open the Resource Matcher</a>
+</section>
+{% endblock %}

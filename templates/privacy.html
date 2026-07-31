@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Privacy &amp; safety — AccessWeave{% endblock %}
+{% block main_class %}wide{% endblock %}
+{% block content %}
+<h1>Privacy &amp; safety</h1>
+<p class="lead">Privacy by design. The system minimizes data collection at every stage.</p>
+
+<section class="grid">
+  <div class="card">
+    <h2>Defaults that protect you</h2>
+    <ul>
+      <li>No diagnosis is ever required.</li>
+      <li>Uploaded images are processed in memory and <strong>not stored</strong>.</li>
+      <li>Location is off by default.</li>
+      <li>Your Access Passport holds preferences, not medical records.</li>
+      <li>Nothing is sent or shared without your confirmation.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>Safety boundaries</h2>
+    <ul>
+      <li>Medical actions are <strong>never</strong> automatic.</li>
+      <li>Dosages and warnings are shown verbatim and never altered.</li>
+      <li>Uncertain, machine-read content is clearly marked for you to verify.</li>
+      <li>Content from files/webpages is treated as data, guarding against injection.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Your controls</h2>
+  <p>You can delete any task and its source at any time. You can also erase everything now.</p>
+  <form method="post" action="{% url 'delete_all_data' %}"
+        onsubmit="return confirm('Delete ALL your tasks and their sources? This cannot be undone.')">
+    {% csrf_token %}
+    <button class="btn danger" type="submit">Delete all my task data now</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Data we keep, and for how long</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Class</th><th>Example</th><th>Default retention</th></tr></thead>
+      <tbody>
+        <tr><td>Ephemeral input</td><td>Uploaded image</td><td>Deleted after processing</td></tr>
+        <tr><td>User preference</td><td>Text scale, contrast</td><td>Until you change or delete it</td></tr>
+        <tr><td>Task state</td><td>Which step you're on</td><td>Until completion or deletion</td></tr>
+        <tr><td>Audit event</td><td>“A task was created”</td><td>Minimal metadata, no content</td></tr>
+        <tr><td>Aggregate evidence</td><td>Category-level rates</td><td>De-identified, no raw records</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

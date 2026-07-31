@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Set up your Access Passport — AccessWeave{% endblock %}
+{% block content %}
+<h1>Set up your Access Passport</h1>
+<p class="muted">This describes how software should behave for you. Pick what helps —
+you can change everything later, or keep several profiles (e.g. a low-energy one).</p>
+
+<form method="post" class="stack">
+  {% csrf_token %}
+
+  <fieldset>
+    <legend>1. How do you control the interface?</legend>
+    <p class="hint">Choose all that apply.</p>
+    <div class="choice-grid">
+      <label class="choice"><input type="checkbox" name="input_modes" value="keyboard" checked> Keyboard</label>
+      <label class="choice"><input type="checkbox" name="input_modes" value="touch"> Touch</label>
+      <label class="choice"><input type="checkbox" name="input_modes" value="voice"> Voice</label>
+      <label class="choice"><input type="checkbox" name="input_modes" value="switch"> Switch</label>
+      <label class="choice"><input type="checkbox" name="input_modes" value="dwell"> Dwell</label>
+    </div>
+    <div class="field" style="margin-top:1rem">
+      <label for="minimum_target_px">Minimum button size (pixels)</label>
+      <input type="number" name="minimum_target_px" id="minimum_target_px" min="44" max="96" value="48">
+      <p class="hint">Larger targets are easier to tap or click. 44 is the accessibility minimum.</p>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>2. How should information be presented?</legend>
+    <div class="field">
+      <label for="text_scale">Text size</label>
+      <select name="text_scale" id="text_scale">
+        <option value="1.0" selected>Normal</option>
+        <option value="1.2">Large</option>
+        <option value="1.6">Larger</option>
+        <option value="2.0">Largest</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="contrast">Contrast / theme</label>
+      <select name="contrast" id="contrast">
+        <option value="system" selected>Match my system</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+        <option value="high">High contrast</option>
+      </select>
+    </div>
+    <div class="choice-grid">
+      <label class="choice"><input type="checkbox" name="speech_enabled" checked> Read cards aloud</label>
+      <label class="choice"><input type="checkbox" name="captions" checked> Captions</label>
+      <label class="choice"><input type="checkbox" name="reduced_motion"> Reduce motion</label>
+      <label class="choice"><input type="checkbox" name="symbols_with_text"> Symbols with text</label>
+      <label class="choice"><input type="checkbox" name="reading_ruler"> Reading ruler</label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>3. How should tasks be organized?</legend>
+    <div class="choice-grid">
+      <label class="choice"><input type="checkbox" name="one_step_at_a_time"> One step at a time</label>
+      <label class="choice"><input type="checkbox" name="plain_language"> Plain language</label>
+      <label class="choice"><input type="checkbox" name="show_progress" checked> Show progress</label>
+      <label class="choice"><input type="checkbox" name="recovery_instructions" checked> Recovery instructions</label>
+      <label class="choice"><input type="checkbox" name="reduced_choice_mode"> Reduce choices</label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>4. What should always require confirmation?</legend>
+    <p class="hint">Medical actions are always blocked from happening automatically — that can't be turned off.</p>
+    <div class="field">
+      <label for="external_action">Sending &amp; sharing</label>
+      <select name="external_action" id="external_action">
+        <option value="strong" selected>Ask me strongly</option>
+        <option value="standard">Ask me</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="financial_action">Payments</label>
+      <select name="financial_action" id="financial_action">
+        <option value="strong" selected>Ask me strongly</option>
+        <option value="block">Never allow</option>
+      </select>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>5. Save this profile as</legend>
+    <div class="field">
+      <label for="name">Profile name</label>
+      <input type="text" name="name" id="name" value="Regular" maxlength="100" required>
+      <p class="hint">e.g. Regular, Low-energy, Travel, Work.</p>
+    </div>
+  </fieldset>
+
+  <button class="btn big" type="submit">Save passport &amp; start a task</button>
+</form>
+{% endblock %}

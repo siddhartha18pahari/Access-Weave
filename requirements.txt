@@ -1,0 +1,15 @@
+# AccessWeave dependencies.
+#
+# Only Django + pydantic are REQUIRED to run the app locally — everything else
+# degrades gracefully if missing (see core/ocr.py, core/export.py, settings.py).
+Django>=5.2,<5.3
+pydantic>=2.7
+
+# Optional locally, installed in production:
+Pillow>=10            # image quality checks for uploaded photos
+reportlab>=4          # PDF Access Passport export
+whitenoise>=6.8       # static file serving (auto-enabled when importable)
+psycopg[binary]>=3.2  # PostgreSQL driver, used when DATABASE_URL is set
+
+# Optional OCR path (also needs the Tesseract binary on the system):
+# pytesseract>=0.3.13

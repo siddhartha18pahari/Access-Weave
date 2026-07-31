@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+db.sqlite3
+.env
+.git
+.github
+staticfiles/
+node_modules/
+test-results/
+playwright-report/
+.tmp/
+*.log

@@ -1,0 +1,81 @@
+/* Accessibility primitives: focus, skip links, targets, motion, reading ruler. */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+/* Visible focus everywhere — never removed. */
+:focus-visible {
+  outline: 4px solid var(--aw-focus);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+/* Fallback for browsers without :focus-visible */
+a:focus, button:focus, input:focus, select:focus, textarea:focus, [tabindex]:focus {
+  outline: 3px solid var(--aw-focus);
+  outline-offset: 2px;
+}
+
+/* Minimum target size comes from the passport. */
+button,
+.btn,
+input[type="checkbox"],
+input[type="radio"],
+select,
+a.action,
+.phrase {
+  min-height: var(--aw-target-size);
+}
+.btn, button, a.action, .phrase { min-width: var(--aw-target-size); }
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--aw-primary);
+  color: var(--aw-primary-text);
+  padding: 0.75rem 1rem;
+  z-index: 1000;
+  border-radius: 0 0 8px 0;
+}
+.skip-link:focus { left: 0; }
+
+/* Screen-reader-only text */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Reduced motion: honor both the OS setting and the passport toggle. */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+:root[data-reduced-motion="true"] * {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Reading ruler: a soft highlight band that follows the pointer/focus row. */
+:root[data-reading-ruler="true"] .ruler {
+  position: fixed;
+  left: 0; right: 0;
+  height: 2.6rem;
+  background: color-mix(in srgb, var(--aw-focus) 22%, transparent);
+  border-top: 2px solid var(--aw-focus);
+  border-bottom: 2px solid var(--aw-focus);
+  pointer-events: none;
+  z-index: 50;
+  display: block;
+}
+.ruler { display: none; }
+
+/* Symbols alongside text (AAC support) */
+:root:not([data-symbols="true"]) .symbol { display: none; }
+.symbol { font-size: 1.4em; margin-right: 0.4rem; }

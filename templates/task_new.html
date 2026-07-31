@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}New task — AccessWeave{% endblock %}
+{% block content %}
+<h1>Start a task</h1>
+<p class="muted">Tell me your goal, then give me the thing you're stuck on. You can
+  <strong>speak</strong>, <strong>take a photo</strong>, or type — whatever works for you.</p>
+
+{% if ocr_message %}<div class="alert" role="status">{{ ocr_message }}</div>{% endif %}
+
+<p class="tip">Tip: press the <strong>Voice</strong> button (bottom of the screen) or <kbd>Alt</kbd>+<kbd>V</kbd>, speak your goal, then say “go” — AccessWeave builds the task and reads it aloud.</p>
+
+<form method="post" enctype="multipart/form-data" class="card stack" data-voice-submit>
+  {% csrf_token %}
+
+  <div class="field">
+    <label for="goal">1. What do you want to do?</label>
+    <div class="btn-row" style="align-items:flex-start">
+      <input type="text" name="goal" id="goal" maxlength="300" style="flex:1;min-width:12rem"
+             placeholder="e.g. Read my medicine label"
+             value="{{ posted.goal|default:'' }}">
+      <button class="btn secondary" type="button"
+              data-voice-target="goal" data-voice-label="Speak"
+              aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg> Speak</button>
+    </div>
+    <p class="hint">Prefer voice? Tap “Speak” and say your goal out loud.</p>
+  </div>
+
+  <fieldset>
+    <legend>2. Give me the thing you're stuck on</legend>
+
+    <div class="field">
+      <label for="image"><svg class="icon" aria-hidden="true"><use href="#i-cam"/></svg> Take a photo of a label, sign, or form</label>
+      <input type="file" name="image" id="image"
+             accept="image/png,image/jpeg,image/webp" capture="environment">
+      <p id="ocr-status" class="hint" role="status" aria-live="polite" hidden></p>
+      <p class="hint">On a phone this opens your camera. The photo is read
+        <strong>on your device</strong> — only the text is sent, never the image.</p>
+    </div>
+
+    <div class="field">
+      <label for="page_url"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg> …or paste a web address of a page you can't use</label>
+      <input type="text" name="page_url" id="page_url" inputmode="url"
+             placeholder="https://example.com/confusing-page"
+             value="{{ posted.page_url|default:'' }}">
+      <p class="hint">I'll fetch the page, strip the menus, adverts, and scripts,
+        and rebuild just the content as accessible steps.</p>
+    </div>
+
+    <div class="field">
+      <label for="source_text">…or speak / paste / type the text</label>
+      <div class="btn-row" style="align-items:flex-start">
+        <textarea name="source_text" id="source_text" style="flex:1"
+          placeholder="Speak it, paste it, or type it here.">{{ posted.source_text|default:'' }}</textarea>
+        <button class="btn secondary" type="button"
+                data-voice-target="source_text" data-voice-label="Speak"
+                aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg> Speak</button>
+      </div>
+      <p class="hint">Nothing here is stored after your task unless you choose to keep it.</p>
+    </div>
+  </fieldset>
+
+  <label class="choice" style="max-width:26rem">
+    <input type="checkbox" name="no_storage"> No-storage mode (erase the source the moment this task is built)
+  </label>
+  <label class="choice" style="max-width:26rem">
+    <input type="checkbox" name="is_routine"> Save as a routine I can repeat (e.g. morning meds, leaving the house)
+  </label>
+
+  <div>
+    <button class="btn big" type="submit">Make it accessible</button>
+  </div>
+</form>
+
+<section class="card" style="margin-top:1.5rem">
+  <h2>Try an example</h2>
+  <p class="muted">These fill the text box for a quick demo (you can also copy the text yourself):</p>
+  <div class="stack">
+    <div class="card" style="margin:0">
+      <p><strong>Medicine label:</strong> “Take one capsule twice daily with food.
+      Do not exceed two capsules in 24 hours. Contact your pharmacist if dizziness persists.”</p>
+      <button class="btn ghost" type="button" data-example="Take one capsule twice daily with food. Do not exceed two capsules in 24 hours. Contact your pharmacist if dizziness persists.">Use the medicine example</button>
+    </div>
+    <div class="card" style="margin:0">
+      <p><strong>Confusing instruction:</strong> “Applicants shall, prior to
+      submission, ensure that all aforementioned fields are completed in
+      accordance with the requirements set forth herein; failure to comply may
+      result in rejection.”</p>
+      <button class="btn ghost" type="button" data-example="Applicants shall, prior to submission, ensure that all aforementioned fields are completed in accordance with the requirements set forth herein; failure to comply may result in rejection.">Use the instruction example</button>
+    </div>
+    <div class="card" style="margin:0">
+      <p><strong>Bill:</strong> “ACME Electric. Invoice #4471. Amount due: $84.20.
+      Due date: 03/15/2026. Account number: 99812.”</p>
+      <button class="btn ghost" type="button" data-example="ACME Electric. Invoice #4471. Amount due: $84.20. Due date: 03/15/2026. Account number: 99812.">Use the bill example</button>
+    </div>
+    <div class="card" style="margin:0">
+      <p><strong>Appointment:</strong> “Your appointment is scheduled for Tuesday,
+      March 10 at 2:30pm at Riverside Clinic. Please arrive 15 minutes early and
+      bring your referral letter.”</p>
+      <button class="btn ghost" type="button" data-example="Your appointment is scheduled for Tuesday, March 10 at 2:30pm at Riverside Clinic. Please arrive 15 minutes early and bring your referral letter.">Use the appointment example</button>
+    </div>
+  </div>
+  <p class="hint">Or just say a goal like “help me cook dinner”, “write an email”, or “set up voice control”.</p>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/capture.js' %}?v={{ aw_v }}" defer></script>
+<script>
+  document.querySelectorAll("[data-example]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      const box = document.getElementById("source_text");
+      box.value = b.dataset.example;
+      box.focus();
+    });
+  });
+</script>
+{% endblock %}

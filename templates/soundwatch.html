@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Sound Watch — AccessWeave{% endblock %}
+{% block content %}
+<h1><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg> Sound Watch</h1>
+<p class="muted">For when you can't hear what's around you: I watch for loud
+  sounds — a doorbell, an alarm, a knock — and alert you <strong>visually and with
+  vibration</strong>. Everything runs on your device; no audio is recorded,
+  stored, or uploaded.</p>
+
+<div class="card">
+  <p id="sw-status" class="hint" role="status" aria-live="polite">
+    Press Start, then allow microphone access.</p>
+
+  <div class="bar-meter" aria-hidden="true" style="margin:0.6rem 0">
+    <span id="sw-meter" style="width:0%"></span>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn big" id="sw-start" type="button"
+            data-worklet-url="{% static 'js/sound-worklet.js' %}"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg> Start watching</button>
+    <button class="btn secondary" id="sw-stop" type="button" hidden><svg class="icon" aria-hidden="true"><use href="#i-stop"/></svg> Stop</button>
+    <button class="btn secondary" id="sw-notify" type="button"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg> Alert me in other tabs</button>
+  </div>
+  <p id="sw-bg-state" class="small muted" role="status" style="margin:0.6rem 0 0"></p>
+
+  <div class="field" style="margin-top:1rem;max-width:22rem">
+    <label for="sw-sensitivity">Sensitivity</label>
+    <input type="range" id="sw-sensitivity" min="2" max="9" step="1" value="5"
+           aria-describedby="sw-sens-hint">
+    <p class="hint" id="sw-sens-hint">Higher = react to quieter sounds.</p>
+  </div>
+</div>
+
+<section class="card">
+  <h2>Recent sounds</h2>
+  <ul id="sw-log" class="stack" style="list-style:none;padding:0;margin:0"></ul>
+  <p class="hint">Only the time and a rough description are kept on this page —
+    never the audio itself. This list clears when you leave.</p>
+</section>
+
+<section class="card">
+  <h2>Good to know</h2>
+  <ul>
+    <li>The alert is a single slow colour pulse — never flashing or strobing.</li>
+    <li>On phones, you'll also feel a vibration.</li>
+    <li>I describe the sound's <em>pattern</em> (short, repeating, continuous) —
+      I can't identify exactly what made it.</li>
+    <li><strong>It keeps watching when you switch tabs.</strong> Detection runs on
+      the browser's audio thread, which isn't paused for background tabs. Turn on
+      “Alert me in other tabs” so a system notification reaches you there.</li>
+    <li>Keep this tab open — closing it stops the watch.</li>
+  </ul>
+</section>
+
+<div id="sw-overlay" class="sw-overlay" role="alert" aria-live="assertive">
+  <p id="sw-overlay-text"></p>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/sound-watch.js' %}?v={{ aw_v }}" defer></script>
+{% endblock %}
