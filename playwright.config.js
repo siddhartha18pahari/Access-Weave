@@ -4,7 +4,7 @@ const { defineConfig, devices } = require("@playwright/test");
 
 module.exports = defineConfig({
   testDir: "./tests/accessibility",
-  timeout: 30000,
+  timeout: 60000,   // axe scans on CI runners can exceed 30s under parallel load
   fullyParallel: true,
   reporter: process.env.CI ? "github" : "list",
   use: {

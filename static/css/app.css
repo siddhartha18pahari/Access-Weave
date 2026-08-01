@@ -746,3 +746,9 @@ h1, h2, h3 { text-wrap: balance; }
   background: var(--aw-surface-2); border: 1px solid var(--aw-border);
   border-radius: 6px; padding: 0.1rem 0.4rem; white-space: nowrap;
 }
+
+/* Buttons inside the primary nav must keep their own foreground colour.
+   `nav.main a` (0-1-2) outranks `.btn` (0-1-0), which silently turned the
+   "Get started" button into dark text on blue — 2.69:1, an axe failure. */
+nav.main a.btn { color: var(--aw-primary-text); }
+nav.main a.btn:hover { background: var(--aw-primary); }

@@ -79,12 +79,17 @@ MIDDLEWARE = [
 try:
     import whitenoise  # noqa: F401
     MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
-    STORAGES = {
-        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
-        },
-    }
+    # The *manifest* storage requires a staticfiles.json produced by
+    # collectstatic. Tests and local dev never run collectstatic, so enabling it
+    # there makes every {% static %} raise "Missing staticfiles manifest entry".
+    # Use it only in production, where the build step does run collectstatic.
+    if not DEBUG:
+        STORAGES = {
+            "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+            "staticfiles": {
+                "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+            },
+        }
 except ImportError:
     pass
 
@@ -178,7 +183,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Bump to force browsers to fetch fresh CSS/JS after an update (dev + prod).
-AW_STATIC_VERSION = os.environ.get("AW_STATIC_VERSION", "19")
+AW_STATIC_VERSION = os.environ.get("AW_STATIC_VERSION", "20")
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "home"
