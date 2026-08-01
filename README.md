@@ -4,6 +4,10 @@
 
 Built for the **Assistive Innovation Challenge 2026**.
 
+![AccessWeave walkthrough: a medicine label is compiled into accessible step cards, ending with a verbatim safety warning and a transparent barrier analysis](docs/media/accessweave-demo.gif)
+
+**Live demo:** https://accessweave.vercel.app — log in as `demo` / `accessweave`
+
 AccessWeave is a privacy-first assistive web app for people with disabilities. Point
 it at a medicine label, paste a confusing form, or just describe a goal — it finds
 the **barriers**, then **recompiles** the task into clear, accessible **Access Cards**
